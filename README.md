@@ -54,7 +54,7 @@
 ### Installation
 1. Clone the repository:
 
-   git clone https://github.com/your-username/dormigo.git
+   git clone [https://github.com/your-username/dormigo](https://github.com/Sangeetha0710/Dormigo)
    cd dormigo
 
 
