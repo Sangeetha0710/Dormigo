@@ -81,23 +81,6 @@
    
    python manage.py migrate
    python manage.py runserver
-  
-
----
-
-## 📂 Folder Structure
-
-dormigo/
-├── frontend/
-│   └── templates/
-├── backend/
-│   └── django project files
-├── static/
-├── firebase/
-│   └── firestore and auth configs
-├── README.md
-├── requirements.txt
-└── .env (ignored)
 
 
 ---
@@ -124,8 +107,8 @@ dormigo/
 ## 📧 Contact
 
 Created with ❤️ by **Team Dormigo**
-Email: \[[your-email@example.com](mailto:your-email@example.com)]
-LinkedIn: \[Your LinkedIn]
+Email: sangeethausha2005@gmail.com
+
 
 ---
 
