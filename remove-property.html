@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Remove Property</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-image: url('https://media.istockphoto.com/id/1281736074/vector/abstract-geometric-pattern-background.jpg?s=612x612&w=0&k=20&c=rTHAuJPGgbaGZCDh6PAoVkJr3mTvn5WppwDHAPfNgoU=');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      margin-top: 80px;
+      max-width: 600px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-label {
+      font-weight: bold;
+    }
+
+    .btn-danger {
+      width: 100%;
+      border-radius: 25px;
+    }
+
+    .confirmation-message {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: 90%;
+      display: none;
+      margin: 20px 0;
+    }
+
+    .alert {
+      border-radius: 25px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Confirmation Message -->
+    <div id="confirmationMessage" class="alert alert-success confirmation-message" role="alert"></div>
+
+    <div class="header">
+      <h1>Remove Property</h1>
+    </div>
+
+    <div class="card">
+      <form id="removePropertyForm">
+        <div class="mb-3">
+          <label for="propertySelect" class="form-label">Select Property to Remove</label>
+          <select class="form-select" id="propertySelect" required>
+            <option value="" disabled selected>Select a property</option>
+            <!-- Properties will be populated dynamically -->
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="noticePeriod" class="form-label">Notice Period (months)</label>
+          <input type="number" class="form-control" id="noticePeriod" min="3" placeholder="Minimum 3 months" required>
+          <small class="form-text text-muted">You must provide at least 3 months' notice before removing the property.</small>
+        </div>
+        <button type="submit" class="btn btn-danger">Remove Property</button>
+      </form>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2024 Dormigo. All rights reserved.</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCb0bcXjN63CuW8EqWNniQFp4puAlW_G44",
+      authDomain: "authentication-7fa36.firebaseapp.com",
+      projectId: "authentication-7fa36",
+      storageBucket: "authentication-7fa36.appspot.com",
+      messagingSenderId: "712186051340",
+      appId: "1:712186051340:web:561e0b491c395dee93e729"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Fetch properties from Firebase and populate the select dropdown
+    async function loadProperties() {
+      const propertiesRef = collection(db, "properties");
+      const querySnapshot = await getDocs(propertiesRef);
+      const propertySelect = document.getElementById("propertySelect");
+
+      querySnapshot.forEach((doc) => {
+        const property = doc.data();
+        const option = document.createElement("option");
+        option.value = doc.id; // Store the document ID
+        option.textContent = property.name; // Property name
+        propertySelect.appendChild(option);
+      });
+    }
+
+    // Call the function to load properties when the page loads
+    loadProperties();
+
+    document.getElementById('removePropertyForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Get values from form
+      const propertySelect = document.getElementById('propertySelect');
+      const propertyId = propertySelect.value;
+      const noticePeriod = parseInt(document.getElementById('noticePeriod').value);
+
+      // Check if notice period is valid (at least 3 months)
+      if (noticePeriod < 3) {
+        alert('The notice period must be at least 3 months.');
+        return;
+      }
+
+      // Display confirmation message
+      document.getElementById('confirmationMessage').innerText = `Property "${propertySelect.options[propertySelect.selectedIndex].text}" will be removed with a ${noticePeriod}-month notice period.`;
+      document.getElementById('confirmationMessage').style.display = 'block';
+
+      // Hide message after 3 seconds
+      setTimeout(function() {
+        document.getElementById('confirmationMessage').style.display = 'none';
+      }, 3000);
+
+      // Here, you would send data to the backend (e.g., using AJAX) to update the database
+      // Example: removeProperty(propertyId, noticePeriod);
+
+      // Reset the form
+      this.reset();
+    });
+  </script>
+</body>
+</html>

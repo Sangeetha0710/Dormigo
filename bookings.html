@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dormigo - Find Your Stay</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        header {
+            background-color: #0062cc;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .banner {
+            background-color: #a8e4dc;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            margin: 15px;
+            border-radius: 8px;
+        }
+        #search-bar {
+            width: 60%;
+            padding: 12px;
+            margin: 15px auto;
+            display: block;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .filter-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-buttons button {
+            background-color: #e3f7f5;
+            border: none;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .filter-buttons button:hover {
+            background-color: #c8e5e3;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .options button {
+            background-color: #f0f0f0;
+            margin: 5px;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .options button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .range-input {
+            margin: 10px 0;
+        }
+
+        .save-btn, .close-btn {
+            margin: 15px 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #00bfa6;
+            color: white;
+            cursor: pointer;
+        }
+
+        .save-btn:hover, .close-btn:hover {
+            background-color: #009980;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: flex;
+            gap: 20px;
+        }
+        .listings {
+            flex: 1.5;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .listing {
+            display: flex;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            align-items: center;
+        }
+        .listing img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+        .listing-info {
+            flex: 1;
+        }
+        .listing h3 {
+            margin: 5px 0;
+        }
+        .listing p {
+            margin: 5px 0;
+        }
+        .listing button {
+            margin-top: 5px;
+            padding: 8px;
+            background-color: #0062cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .listing button:hover {
+            background-color: #004bb5;
+        }
+        .leaflet-control {
+            z-index: 5; /* Lower than modal's z-index */
+        }
+        .map-container {
+            flex: 1;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 10px;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Dormigo - Find Your Stay</h1>
+    </header>
+    <div class="banner">
+        Skip the queue. Book a house visit today! Get perks like first preference, complete show-around, and expert assistance.
+    </div>
+    <input type="text" id="search-bar" placeholder="Search for PGs, Hostels, Hotels">
+    <div class="filter-container">
+        <div class="filter-buttons">
+            <button id="localityBtn">Locality</button>
+            <button id="budgetBtn">Budget</button>
+            <button id="genderBtn">Gender</button>
+            <button id="preferredByBtn">Preferred By</button>
+            <button id="occupancyBtn">Occupancy</button>
+            <button id="bhkBtn">BHK</button>
+            <button id="amenitiesBtn">Amenities</button>
+            <button id="moreFiltersBtn">More Filters</button>
+
+
+        </div>    
+    </div>
+        <!-- Locality Filter Modal -->
+        <div class="modal" id="localityModal">
+            <div class="modal-content">
+                <h3>Select Locality</h3>
+                <div class="options">
+                    <button>Chennai</button>
+                    <button>Coimbatore</button>
+                    <button>Madurai</button>
+                    <button>Tiruchirappalli</button>
+                    <button>Tiruppur</button>
+                    <button>Tirunelveli</button>
+                    <button>Thoothukudi</button>
+                    <button>Salem</button>
+                    <button>Kancheepuram</button>
+                    <button>Thanjavur</button>
+                    <button>Kanyakumari</button>
+                    <button>Dindigul</button>
+                    <button>Vellore</button>
+                    <button>Pudukottai</button>
+                    <button>Virudhunagar</button>
+                    <button>Tiruvannamalai</button>
+    
+                </div>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+    
+        <!-- Budget Filter Modal -->
+        <div class="modal" id="budgetModal">
+            <div class="modal-content">
+                <h3>Select Budget</h3>
+                <div class="range-input">
+                    <input type="range" min="10000" max="200000" value="10000" id="minPrice" step="500">
+                    <input type="range" min="10000" max="200000" value="200000" id="maxPrice" step="500">
+                </div>
+                <p>Min Price: ₹<span id="minPriceLabel">10000</span> - Max Price: ₹<span id="maxPriceLabel">200000</span></p>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+
+        <!-- Gender Filter Modal -->
+        <div class="modal" id="genderModal">
+            <div class="modal-content">
+                <h3>Select Gender</h3>
+                <div class="options">
+                    <button>Male</button>
+                    <button>Female</button>
+                </div>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+
+        <!-- Preferred By Filter Modal -->
+        <div class="modal" id="preferredByModal">
+            <div class="modal-content">
+                <div class="options">
+                    <button>Students</button>
+                    <button>Working Professionals</button>
+                </div>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+
+        <!-- Occupancy Filter Modal -->
+        <div class="modal" id="occupancyModal">
+            <div class="modal-content">
+                <h3>Select Gender</h3>
+                <div class="options">
+                    <button>Single Occupancy</button>
+                    <button>Double Occupancy</button>
+                    <button>Triple Occupancy</button>
+                    <button>Quadruple Occupancy</button>
+                    <button>Quintuple Occupancy</button>
+                    <button>Dorm</button>
+                </div>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+    
+        <!-- BHK Filter Modal -->
+        <div class="modal" id="bhkModal">
+            <div class="modal-content">
+                <h3>Select BHK</h3>
+                <div class="options">
+                    <button>1 BHK</button>
+                    <button>2 BHK</button>
+                    <button>3 BHK</button>
+                    <button>4 BHK</button>
+                </div>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+    
+        <!-- Amenities Filter Modal -->
+        <div class="modal" id="amenitiesModal">
+            <div class="modal-content">
+                <h3>Select Amenities</h3>
+                <div class="options">
+                    <button>WiFi</button>
+                    <button>Air Conditioning</button>
+                    <button>Parking</button>
+                    <button>Gym</button>
+                    <button>Swimming Pool</button>
+                    <button>Attached Balcony</button>
+                    <button>Attached Washroom</button>
+                    <button>Storage Shelf</button>
+                </div>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+        <!-- More Filter Modal -->
+        <div class="modal" id="MoreFilterModal">
+            <div class="modal-content">
+                <h3>Services</h3>
+                <div class="options">
+                    <button>High-Speed WiFi</button>
+                    <button>Power Backup</button>
+                    <button>Laundry Services</button>
+                    <button>Professional Housekeeping</button>
+                    <button>Spacious Refrigerator</button>
+                    <button>Washing Machine</button>
+                    <button>Hot Water Supply</button>
+                    <button>24x7 Security Survillance</button>
+                    <button>Water Puriffier</button>
+                    <button>Flat Screen Television</button>
+                    <button>In-House Cafeteria</button>
+        
+                </div>
+                <button class="save-btn">Save</button>
+                <button class="close-btn">Close</button>
+            </div>
+        </div>
+        <div class="container">
+            <div class="listings">
+                <h2>Available Properties</h2>
+                <div class="listing" onclick="window.location.href='property1.html';">
+                    <img src="https://res.cloudinary.com/stanza-living/image/upload/f_auto,q_auto/e_improve/e_sharpen:10/e_saturation:10/f_auto,q_auto/v1641235534/Website/CMS-Uploads/riwq5fh5kssow3ri2w35.jpg" alt="Property 1">
+                    <div class="listing-info">
+                        <h3>Cozy Apartment in Chennai</h3>
+                        <p>2 BHK | ₹15,000/month | WiFi, AC</p>
+                        <div class="property-buttons">
+                            <button class="property-button" onclick="openPopup(event)">Schedule Visit</button>
+                            <button class="property-button" onclick="openPopup(event)">Request Callback</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="listing" onclick="window.location.href='property2.html';">
+                    <img src="https://res.cloudinary.com/stanza-living/image/upload/f_auto,q_auto,w_600/e_improve/e_sharpen:10/e_saturation:10/f_auto,q_auto/v1614603390/Website/CMS-Uploads/hbwtwpk9rwh3ndsufrbr.jpg" alt="Property 2">
+                    <div class="listing-info">
+                        <h3>Luxury PG in Coimbatore</h3>
+                        <p>Single Occupancy | ₹12,000/month | Food Included</p>
+                        <div class="property-buttons">
+                            <button class="property-button" onclick="openPopup(event)">Schedule Visit</button>
+                            <button class="property-button" onclick="openPopup(event)">Request Callback</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="listing" onclick="window.location.href='property3.html';">
+                    <img src="https://housing-images.n7net.in/01c16c28/e573803cf2bbd427f2db446c18dbe0f4/v0/medium/3_bhk_apartment-for-sale-kandivali_east-Mumbai-hall.jpg" alt="Property 3">
+                    <div class="listing-info">
+                        <h3>Spacious Flat in Madurai</h3>
+                        <p>3 BHK | ₹20,000/month | Parking Available</p>
+                        <div class="property-buttons">
+                            <button class="property-button" onclick="openPopup(event)">Schedule Visit</button>
+                            <button class="property-button" onclick="openPopup(event)">Request Callback</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="listing" onclick="window.location.href='property4.html';">
+                    <img src="https://www.doonpublicschool.in/content/hostel.JPG" alt="Property 4">
+                    <div class="listing-info">
+                        <h3>Comfortable Hostel in Tiruchirappalli</h3>
+                        <p>Shared Room | ₹8,000/month | WiFi Included</p>
+                        <div class="property-buttons">
+                            <button class="property-button" onclick="openPopup(event)">Schedule Visit</button>
+                            <button class="property-button" onclick="openPopup(event)">Request Callback</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="map-container">
+                <h2>Map View</h2>
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const map = L.map('map').setView([12.9716, 77.5946], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        $(document).ready(function () {
+            // Function to open modal
+            function openModal(modalId, buttonId) {
+                const button = $(buttonId);
+                const modal = $(modalId);
+
+                const buttonOffset = button.offset();
+                const buttonHeight = button.outerHeight();
+
+                modal.css({
+                    top: buttonOffset.top + buttonHeight + 5,
+                    left: buttonOffset.left,
+                    position: 'absolute'
+                }).fadeIn();
+            }
+
+            // Function to close a specific modal
+            function closeModal(modalId) {
+                $(modalId).fadeOut();
+            }
+
+            // Event listeners for opening each modal
+            $('#localityBtn').click(function(event) {
+                event.stopPropagation(); // Prevents closing on button click
+                openModal('#localityModal', '#localityBtn');
+            });
+            $('#budgetBtn').click(function(event) {
+                event.stopPropagation();
+                openModal('#budgetModal', '#budgetBtn');
+            });
+            $('#genderBtn').click(function(event) {
+                event.stopPropagation();
+                openModal('#genderModal', '#genderBtn');
+            });
+            $('#preferredByBtn').click(function(event) {
+                event.stopPropagation();
+                openModal('#preferredByModal', '#preferredByBtn');
+            });
+            $('#occupancyBtn').click(function(event) {
+                event.stopPropagation();
+                openModal('#occupancyModal', '#occupancyBtn');
+            });
+            $('#bhkBtn').click(function(event) {
+                event.stopPropagation();
+                openModal('#bhkModal', '#bhkBtn');
+            });
+            $('#amenitiesBtn').click(function(event) {
+                event.stopPropagation();
+                openModal('#amenitiesModal', '#amenitiesBtn');
+            });
+            $('#moreFiltersBtn').click(function(event) {
+                event.stopPropagation();
+                openModal('#MoreFilterModal', '#moreFiltersBtn');
+            });
+
+            // Event listeners for closing each modal with the close button
+            $('.close-btn').click(function(event) {
+                event.stopPropagation();
+                $(this).closest('.modal').fadeOut();
+            });
+
+            // Close modal when clicking outside the modal-content area
+            $(document).click(function (e) {
+                if ($('.modal:visible').length && !$(e.target).closest('.modal-content').length) {
+                    $('.modal').fadeOut();
+                }
+            });
+        });
+        
+
+    </script>
+</body>
+</html>

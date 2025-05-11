@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Page</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    margin: auto;
+    padding: 20px;
+}
+
+.property-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.property-header h1 {
+    font-size: 24px;
+}
+
+.badge {
+    background-color: #008080;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.map-button {
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.property-content {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.left-column, .right-column {
+    flex: 1;
+}
+
+.image-slider {
+    position: relative;
+}
+
+.image-slider img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.image-caption {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+.price {
+    font-size: 24px;
+    color: #333;
+}
+
+.current-price {
+    font-weight: bold;
+    color: #e67e22;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.tab {
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.tab.active {
+    background-color: #1abc9c;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+    margin-top: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.occupancy-options, .amenities-list, .services-list {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.option, .amenity-item, .service-item {
+    background-color: #f7f7f7;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    flex: 1;
+    min-width: 150px;
+}
+
+.booking-box {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.booking-box input, .booking-box select, .reserve-button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+}
+
+.checkbox input[type="checkbox"] {
+    margin: 0;
+    padding: 0;
+    /* Adjust width and height if necessary */
+    width: auto;
+    height: auto;
+}
+
+.checkbox label {
+    margin-left: 4px; /* Adjust to control the spacing */
+    padding: 0;
+}
+
+.reserve-button {
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="property-header">
+            <h1>Adana House <span class="badge">Male</span></h1>
+            <p>Sf No.-946/3b, Naren Garden, Kalapatti Road, Avinashi Road, Coimbatore</p>
+            <button class="map-button">Show on Map</button>
+        </div>
+
+        <div class="property-content">
+            <div class="left-column">
+                <div class="image-slider">
+                    <img src="https://res.cloudinary.com/stanza-living/image/upload/f_auto,q_auto/e_improve/e_sharpen:10/e_saturation:10/f_auto,q_auto/v1641235534/Website/CMS-Uploads/riwq5fh5kssow3ri2w35.jpg" alt="Property Image">
+                    <div class="image-caption">2 People Viewing Now</div>
+                </div>
+                
+                <p class="price">Starts from <span class="current-price">₹8,699/mo*</span> <span class="original-price">₹9,000/mo</span></p>
+                <p class="price-note">*Denotes starting price inclusive of taxes. Final prices may vary based on room occupancy, customized services, and additional attributes.</p>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="openTab('occupancy')">Occupancy</button>
+                    <button class="tab" onclick="openTab('amenities')">Amenities</button>
+                    <button class="tab" onclick="openTab('details')">Details</button>
+                </div>
+                
+                <div id="occupancy" class="tab-content active">
+                    <h3>Available Occupancies</h3>
+                    <div class="occupancy-options">
+                        <div class="option">
+                            <p>Triple Occupancy</p>
+                            <p class="option-price"><span class="strikethrough">₹9,000</span> ₹9,299/mo*</p>
+                        </div>
+                        <div class="option">
+                            <p>Quadruple Occupancy</p>
+                            <p class="option-price"><span class="strikethrough">₹9,000</span> ₹8,699/mo*</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="amenities" class="tab-content">
+                    <h3>Amenities</h3>
+                    <div class="amenities-list">
+                        <span class="amenity-item">Attached Washroom</span>
+                        <span class="amenity-item">Spacious Cupboard</span>
+                    </div>
+                </div>
+
+                <div id="details" class="tab-content">
+                    <h3>Services</h3>
+                    <div class="services-list">
+                        <span class="service-item">Hot and Delicious Meals</span>
+                        <span class="service-item">High-Speed WiFi</span>
+                        <span class="service-item">Professional Housekeeping</span>
+                        <span class="service-item">Spacious Refrigerator</span>
+                        <span class="service-item">Washing Machine</span>
+                        <span class="service-item">Hot Water Supply</span>
+                        <span class="service-item">Biometric Enabled Entry</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="booking-box">
+                    <h3>Reserve Now</h3>
+                    <form>
+                        <input type="text" placeholder="First Name" required>
+                        <input type="tel" placeholder="Mobile Number" required>
+                        <input type="text" placeholder="Enter Referral Code (Optional)">
+                        <select required>
+                            <option>Select Occupancy</option>
+                            <option>Single Occupancy</option>
+                            <option>Double Occupancy</option>
+                            <option>Triple Occupancy</option>
+                            <option>Quadruple Occupancy</option>
+                        </select>
+                        <p class="booking-note">We are accepting bookings for stay duration of minimum 3 months.</p>
+                        <div class="checkbox">
+                            <input type="checkbox" id="whatsapp" name="whatsapp">
+                            <label for="whatsapp">Get updates over WhatsApp</label>
+                        </div>
+                        <br>
+                        <div class="checkbox">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms">I agree to the <a href="#">terms & conditions</a></label>
+                        </div>
+                        <button type="submit" class="reserve-button" ><a href="payment.html">Reserve Now</a></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+    var i;
+    var x = document.getElementsByClassName("tab-content");
+    var tabs = document.getElementsByClassName("tab");
+
+    for (i = 0; i < x.length; i++) {
+        x[i].classList.remove("active");
+    }
+    for (i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove("active");
+    }
+
+    document.getElementById(tabName).classList.add("active");
+    event.currentTarget.classList.add("active");
+}
+
+    </script>
+</body>
+</html>
