@@ -54,7 +54,7 @@
 ### Installation
 1. Clone the repository:
 
-   git clone [https://github.com/your-username/dormigo](https://github.com/Sangeetha0710/Dormigo)
+   git clone (https://github.com/Sangeetha0710/Dormigo)
    cd dormigo
 
 
@@ -92,15 +92,6 @@
 * Advanced admin dashboard
 * Integration with government databases for ID verification
 
----
-
-## 🤝 Contributing
-
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add new feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a Pull Request
 
 ---
 
